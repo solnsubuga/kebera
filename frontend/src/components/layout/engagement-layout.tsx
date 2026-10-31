@@ -1,4 +1,4 @@
-import { Link, Outlet, useLocation, useParams } from 'react-router'
+import { Link, Outlet, useLocation, useOutletContext, useParams } from 'react-router'
 
 import { Skeleton } from '@/components/ui/skeleton'
 import { useEngagement } from '@/features/engagements/api'
@@ -43,11 +43,12 @@ export function EngagementLayout() {
 /** The Test stage: its five tabs, then the tab's screen. */
 export function TestStageLayout() {
   const { id = '' } = useParams()
+  const engagement = useOutletContext()
   return (
     <>
       <EngagementTabs label="Test views" items={testTabs(id)} />
       <div className="flex min-h-0 flex-1 flex-col">
-        <Outlet />
+        <Outlet context={engagement} />
       </div>
     </>
   )

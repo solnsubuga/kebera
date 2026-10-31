@@ -38,7 +38,6 @@ export function useRegisterCommands(commands: PaletteCommand[]) {
     if (!ctx) return
     ctx.register(owner, commands)
     return () => ctx.unregister(owner)
-    // ctx functions are stable; re-run only when the commands change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // register and unregister are stable, so re-run only when the commands change
   }, [owner, commands])
 }

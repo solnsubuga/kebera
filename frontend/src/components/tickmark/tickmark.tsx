@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -34,6 +34,12 @@ export type TickmarkProps = {
 export function Tickmark({ kind, confirmed = false, children, size = 'md', label, className }: TickmarkProps) {
   const spec = TICKMARKS[kind]
   const solid = confirmed || kind === 'signed'
+  // Fill in like a pen stroke only when a mark turns solid on screen, not when it first renders solid.
+  const wasSolid = useRef(solid)
+  const justConfirmed = solid && !wasSolid.current
+  useEffect(() => {
+    wasSolid.current = solid
+  }, [solid])
   const name = label ?? (spec.label ? `${spec.label}, ${solid ? 'confirmed by a person' : 'proposed'}` : undefined)
   return (
     <span
@@ -44,7 +50,9 @@ export function Tickmark({ kind, confirmed = false, children, size = 'md', label
       className={cn(
         'inline-flex shrink-0 items-center justify-center rounded-full border-[1.5px] font-mono leading-none font-semibold select-none',
         size === 'md' ? 'size-[22px] text-[11.5px]' : 'size-5 text-[11px]',
-        solid ? cn(SOLID[spec.ink], 'motion-safe:animate-mark-fill') : cn(HOLLOW[spec.ink], 'bg-sheet'),
+        solid
+          ? cn(SOLID[spec.ink], justConfirmed && 'motion-safe:animate-mark-fill')
+          : cn(HOLLOW[spec.ink], 'bg-sheet'),
         className,
       )}
     >

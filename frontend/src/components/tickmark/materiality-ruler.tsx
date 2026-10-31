@@ -53,9 +53,9 @@ export function MaterialityRuler({
           style={{ left: at(v) }}
         />
       ))}
-      {misstatements.map((m) => (
+      {misstatements.map((m, i) => (
         <div
-          key={m.label}
+          key={i}
           title={`${m.label}: ${currency} ${formatShort(m.amount)}`}
           className={cn(
             'border-sheet absolute top-[17px] size-3 -translate-x-1/2 rounded-full border-2',
