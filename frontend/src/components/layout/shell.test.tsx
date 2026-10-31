@@ -36,7 +36,7 @@ describe('app shell', () => {
     expect(links[5]).toHaveAttribute('data-state', 'current')
     expect(links[5]).toHaveAttribute('aria-current', 'page')
     expect(links[6]).toHaveAttribute('data-state', 'upcoming')
-    expect(screen.getByRole('link', { name: 'Exceptions' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('link', { name: /^Exceptions/ })).toHaveAttribute('aria-current', 'page')
   })
 
   it('opens the palette with Ctrl-K and turns a question into a run', async () => {

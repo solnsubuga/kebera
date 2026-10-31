@@ -73,10 +73,28 @@ export const routes: RouteObject[] = [
             element: <TestStageLayout />,
             children: [
               { index: true, element: <Navigate to="tests" replace /> },
-              { path: 'analytics', lazy: soon('Statement and model review') },
-              { path: 'tests', lazy: soon('Full-population tests') },
-              { path: 'exceptions', lazy: soon('Exception triage') },
-              { path: 'workpapers', lazy: soon('Workpapers') },
+              {
+                path: 'analytics',
+                lazy: async () => ({
+                  Component: (await import('@/features/testing/pages/analytics-page')).AnalyticsPage,
+                }),
+              },
+              {
+                path: 'tests',
+                lazy: async () => ({ Component: (await import('@/features/testing/pages/tests-page')).TestsPage }),
+              },
+              {
+                path: 'exceptions',
+                lazy: async () => ({
+                  Component: (await import('@/features/testing/pages/exceptions-page')).ExceptionsPage,
+                }),
+              },
+              {
+                path: 'workpapers',
+                lazy: async () => ({
+                  Component: (await import('@/features/testing/pages/workpapers-page')).WorkpapersPage,
+                }),
+              },
               {
                 path: 'requests',
                 lazy: async () => ({
