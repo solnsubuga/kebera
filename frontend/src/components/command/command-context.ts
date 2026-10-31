@@ -34,10 +34,11 @@ export function useCommandPalette() {
 export function useRegisterCommands(commands: PaletteCommand[]) {
   const ctx = use(CommandContext)
   const owner = useId()
+  const register = ctx?.register
+  const unregister = ctx?.unregister
   useEffect(() => {
-    if (!ctx) return
-    ctx.register(owner, commands)
-    return () => ctx.unregister(owner)
-    // register and unregister are stable, so re-run only when the commands change
-  }, [owner, commands])
+    if (!register || !unregister) return
+    register(owner, commands)
+    return () => unregister(owner)
+  }, [register, unregister, owner, commands])
 }

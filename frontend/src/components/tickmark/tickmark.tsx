@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -35,11 +35,12 @@ export function Tickmark({ kind, confirmed = false, children, size = 'md', label
   const spec = TICKMARKS[kind]
   const solid = confirmed || kind === 'signed'
   // Fill in like a pen stroke only when a mark turns solid on screen, not when it first renders solid.
-  const wasSolid = useRef(solid)
-  const justConfirmed = solid && !wasSolid.current
-  useEffect(() => {
-    wasSolid.current = solid
-  }, [solid])
+  const [prevSolid, setPrevSolid] = useState(solid)
+  const [justConfirmed, setJustConfirmed] = useState(false)
+  if (solid !== prevSolid) {
+    setPrevSolid(solid)
+    setJustConfirmed(solid)
+  }
   const name = label ?? (spec.label ? `${spec.label}, ${solid ? 'confirmed by a person' : 'proposed'}` : undefined)
   return (
     <span
