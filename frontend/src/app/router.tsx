@@ -48,10 +48,30 @@ export const routes: RouteObject[] = [
               Component: (await import('@/features/engagements/pages/engagement-page')).EngagementPage,
             }),
           },
-          { path: 'accept', lazy: soon('Accept the client') },
-          { path: 'connect', lazy: soon('Connect books and tie out') },
-          { path: 'understand', lazy: soon('Folder and compliance review') },
-          { path: 'materiality', lazy: soon('Set materiality') },
+          {
+            path: 'accept',
+            lazy: async () => ({
+              Component: (await import('@/features/engagements/pages/accept-page')).AcceptPage,
+            }),
+          },
+          {
+            path: 'connect',
+            lazy: async () => ({
+              Component: (await import('@/features/engagements/pages/connect-page')).ConnectPage,
+            }),
+          },
+          {
+            path: 'understand',
+            lazy: async () => ({
+              Component: (await import('@/features/engagements/pages/understand-page')).UnderstandPage,
+            }),
+          },
+          {
+            path: 'materiality',
+            lazy: async () => ({
+              Component: (await import('@/features/engagements/pages/materiality-page')).MaterialityPage,
+            }),
+          },
           { path: 'risk', lazy: soon('Risks to assertions') },
           { path: 'plan', lazy: soon('Audit plan') },
           {
