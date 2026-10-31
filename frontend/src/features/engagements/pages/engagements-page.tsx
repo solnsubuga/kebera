@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { PageHeader } from '@/components/layout/page-header'
+import { useCan } from '@/features/auth/api'
 import { formatDate } from '@/lib/format'
 
 import { useEngagements } from '../api'
@@ -15,11 +16,12 @@ import { FRAMEWORKS, STATUSES, STATUS_LABEL, type EngagementStatus } from '../ty
 export function EngagementsPage() {
   const [status, setStatus] = useState<EngagementStatus | undefined>()
   const { data, isPending, isError, refetch } = useEngagements(status)
+  const canOpen = useCan('engagements.write')
 
   return (
     <>
-      <PageHeader title="Engagements" description="Every audit you are running, latest period first.">
-        <NewEngagementDialog />
+      <PageHeader title="Engagements" description="Every audit your firm is running, latest period first.">
+        {canOpen && <NewEngagementDialog />}
       </PageHeader>
 
       <div className="mb-4 flex flex-wrap gap-2" role="group" aria-label="Filter by phase">
@@ -50,7 +52,9 @@ export function EngagementsPage() {
         <div className="text-muted-foreground rounded-lg border border-dashed p-10 text-center text-sm">
           {status
             ? `No engagements in ${STATUS_LABEL[status].toLowerCase()}.`
-            : 'No engagements yet. Open the first one.'}
+            : canOpen
+              ? 'No engagements yet. Open the first one.'
+              : 'No engagements yet.'}
         </div>
       ) : (
         <div className="overflow-x-auto rounded-lg border">

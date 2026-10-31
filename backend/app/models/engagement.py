@@ -1,7 +1,8 @@
 import enum
+import uuid
 from datetime import date
 
-from sqlalchemy import CheckConstraint, Date, Enum, String
+from sqlalchemy import CheckConstraint, Date, Enum, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.models.base import Base, Timestamps, UUIDPk
@@ -27,6 +28,8 @@ class Engagement(UUIDPk, Timestamps, Base):
     __tablename__ = "engagements"
     __table_args__ = (CheckConstraint("period_start < period_end", name="period_order"),)
 
+    # The audit firm running it. Every query filters on this: a firm never sees another firm's work.
+    firm_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("firms.id", ondelete="RESTRICT"), index=True)
     client_name: Mapped[str] = mapped_column(String(200))
     period_start: Mapped[date] = mapped_column(Date)
     period_end: Mapped[date] = mapped_column(Date, index=True)

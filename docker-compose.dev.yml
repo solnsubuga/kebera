@@ -29,6 +29,7 @@ services:
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", "app"]
     environment:
       KEBERA_LOG_JSON: "0"
+      KEBERA_PUBLIC_URL: http://localhost:5173  # sign-in links open the Vite server
     volumes: ["./backend/app:/srv/app", "./backend/alembic:/srv/alembic"]
 
   worker:  # not reloaded (it would cut a running job short): docker compose restart worker

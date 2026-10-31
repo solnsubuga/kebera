@@ -36,6 +36,32 @@ Frontend: a folder `src/features/x/` with `types.ts` (mirroring the schemas), `a
 A background job: a function in `app/worker/tasks.py` that opens its own session and is safe to run twice,
 plus a trigger in `SCHEDULES`. Run it by hand with `python -m app.worker run-once <name>`.
 
+## Sign-in and firms
+
+A **firm** is the tenant. Every engagement has a `firm_id`, and every session works in one firm at a time.
+Routes take the caller through `require("<permission>")` (`app/api/deps.py`), which answers 401 without a
+session and 403 without the permission, and hands back a context whose `firm_id` every service query filters
+on. Another firm's engagement answers 404, exactly like one that does not exist. A new feature that stores
+client data must take the firm the same way, with tests in the style of `tests/test_firms.py`.
+
+People sign in with a one-use link emailed to them (no passwords), except **partners**, who also enter a
+password (Argon2; five wrong ones lock the account for 15 minutes). Roles and what they may do:
+
+| Role | Permissions |
+| --- | --- |
+| staff | `engagements.read` |
+| manager | staff's, plus `engagements.write` |
+| partner | manager's, plus `engagements.sign`, `members.manage`, `audit.read` |
+
+A person can be in several firms and switch between them. Sessions are an HttpOnly, SameSite=Lax cookie for
+the web app or `Authorization: Bearer <token>` for scripts; only token hashes are stored. Sign-ins and changes
+to people, roles and engagements go to `audit_events`, which partners read at `/audit`.
+
+Anyone can open a new firm from the sign-in page (turn that off with `KEBERA_SIGNUP_OPEN=0`). From the
+server's shell, `python -m app.cli` creates firms, adds members, prints a sign-in link (for when email is not
+set up) and clears a locked-out partner's password. Emails go to the API log until
+`KEBERA_EMAIL_BACKEND=resend` and `KEBERA_RESEND_API_KEY` are set.
+
 ## Conventions
 
 - Settings come only from `KEBERA_*` environment variables (`app/core/config.py`); `.env.example` lists them.
@@ -51,5 +77,9 @@ unless enabled; nginx serving the app and proxying `/api/` on the same origin; l
 and none for `index.html`; tests that build the database with the real migrations; Compose with a dev override
 for hot reload and a prod override with Caddy for https; accepting plain `postgres://` URLs from hosts.
 
-Left out for now: SQLite support, the country packs, the benchmark pipeline, S3 storage, sign-in and roles.
-Sign-in and per-firm data separation are the next pieces to add before any real client data goes in.
+Also from laba: passwordless sign-in with emailed one-use links, a password step for the most powerful
+role, token hashes instead of tokens, sign-up and sign-in answers that never say who has an account, the
+audit trail, and the shell commands for the first account. Kebera adds firms (laba serves one country per
+deployment, so it has no tenants).
+
+Left out for now: SQLite support, the country packs, the benchmark pipeline, S3 storage.
