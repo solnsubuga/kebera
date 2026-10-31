@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Skeleton } from '@/components/ui/skeleton'
 import { PageHeader } from '@/components/layout/page-header'
 import { ApiError } from '@/lib/api-client'
+import { useCan } from '@/features/auth/api'
 import { formatDate } from '@/lib/format'
 
 import { useEngagement, useUpdateEngagement } from '../api'
@@ -17,6 +18,8 @@ export function EngagementPage() {
   const { id = '' } = useParams()
   const { data: e, isPending, error } = useEngagement(id)
   const update = useUpdateEngagement(id)
+  const canMove = useCan('engagements.write')
+  const canSign = useCan('engagements.sign')
 
   if (error) {
     return (
@@ -75,10 +78,13 @@ export function EngagementPage() {
               </li>
             ))}
           </ol>
-          {next && (
+          {next && canMove && (next !== 'signed' || canSign) && (
             <Button size="sm" onClick={() => void advance()} disabled={update.isPending} className="ml-auto">
               Move to {STATUS_LABEL[next].toLowerCase()}
             </Button>
+          )}
+          {next === 'signed' && canMove && !canSign && (
+            <p className="text-muted-foreground ml-auto text-sm">A partner signs the engagement.</p>
           )}
         </CardContent>
       </Card>

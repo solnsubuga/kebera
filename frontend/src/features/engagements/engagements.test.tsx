@@ -2,7 +2,7 @@ import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
-import { mockApi, renderApp } from '@/test/render'
+import { mockSignedIn, renderApp, staff } from '@/test/render'
 
 import type { Engagement } from './types'
 
@@ -18,11 +18,10 @@ const acme: Engagement = {
 }
 
 const page = (items: Engagement[]) => ({ items, total: items.length, limit: 50, offset: 0 })
-const health = { status: 'ok', database: true, worker: { ok: true, seen_at: null }, version: '0.1.0' }
 
 describe('engagements', () => {
   it('lists engagements with their phase', async () => {
-    mockApi((url) => (url.pathname === '/api/health' ? health : page([acme])))
+    mockSignedIn(() => page([acme]))
     renderApp('/')
     expect(await screen.findByRole('link', { name: 'Acme Uganda Ltd' })).toBeInTheDocument()
     expect(screen.getByText('30 Jun 2026')).toBeInTheDocument()
@@ -30,7 +29,7 @@ describe('engagements', () => {
   })
 
   it('filters by phase through the API', async () => {
-    const fetchMock = mockApi((url) => (url.pathname === '/api/health' ? health : page([])))
+    const fetchMock = mockSignedIn(() => page([]))
     renderApp('/')
     await userEvent.click(await screen.findByRole('button', { name: 'Signed' }))
     expect(await screen.findByText('No engagements in signed.')).toBeInTheDocument()
@@ -39,8 +38,7 @@ describe('engagements', () => {
 
   it('moves an engagement to the next phase', async () => {
     let current = acme
-    mockApi((url, init) => {
-      if (url.pathname === '/api/health') return health
+    mockSignedIn((_url, init) => {
       if (init?.method === 'PATCH') current = { ...current, ...(JSON.parse(String(init.body)) as Partial<Engagement>) }
       return current
     })
@@ -50,10 +48,16 @@ describe('engagements', () => {
   })
 
   it('says when an engagement does not exist', async () => {
-    mockApi((url) =>
-      url.pathname === '/api/health' ? health : Response.json({ detail: 'engagement not found' }, { status: 404 }),
-    )
+    mockSignedIn(() => Response.json({ detail: 'engagement not found' }, { status: 404 }))
     renderApp('/engagements/missing')
     expect(await screen.findByText('This engagement does not exist.')).toBeInTheDocument()
+  })
+
+  it('shows staff the engagements but not the buttons that change them', async () => {
+    mockSignedIn((url) => (url.pathname === '/api/engagements' ? page([acme]) : acme), staff)
+    renderApp('/')
+    expect(await screen.findByRole('link', { name: 'Acme Uganda Ltd' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /New engagement/ })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: 'People' })).not.toBeInTheDocument()
   })
 })

@@ -108,7 +108,15 @@ jobs:
         run: |
           curl -fsS http://localhost:8080/ | grep -q '<div id="root">'
           curl -fsS http://localhost:8080/api/health | tee /dev/stderr | grep -q '"database":true'
+          # Without a session the API refuses; sign in as a manager with a link printed by the CLI.
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/api/engagements)" = 401
+          firm=$(docker compose exec -T api python -m app.cli create-firm "Smoke LLP" partner@smoke.test | awk '{print $2}')
+          docker compose exec -T api python -m app.cli add-member "$firm" manager@smoke.test manager
+          token=$(docker compose exec -T api python -m app.cli link manager@smoke.test | sed 's/.*token=//')
+          session=$(curl -fsS -X POST http://localhost:8080/api/auth/verify -H 'content-type: application/json' \
+            -d "{\"token\":\"$token\"}" | python3 -c 'import json,sys; print(json.load(sys.stdin)["token"])')
           curl -fsS -X POST http://localhost:8080/api/engagements -H 'content-type: application/json' \
+            -H "authorization: Bearer $session" \
             -d '{"client_name":"Smoke Ltd","period_start":"2025-01-01","period_end":"2025-12-31"}' | grep -q '"status":"planning"'
       - name: Logs
         if: failure()

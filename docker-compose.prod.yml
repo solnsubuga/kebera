@@ -20,6 +20,8 @@ services:
       KEBERA_ENV: prod
       KEBERA_DATABASE_URL: ${KEBERA_DATABASE_URL:-postgresql+psycopg://kebera:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}@db:5432/kebera}
       KEBERA_CORS_ORIGINS: '["https://${KEBERA_DOMAIN}"]'
+      KEBERA_PUBLIC_URL: https://${KEBERA_DOMAIN}
+      KEBERA_COOKIE_SECURE: "1"
     ports: !reset []
 
   worker:

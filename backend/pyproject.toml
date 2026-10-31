@@ -13,6 +13,7 @@ dependencies = [
     "pydantic-settings>=2.7",
     "apscheduler>=3.11,<4",
     "structlog>=24.4",
+    "argon2-cffi>=23.1",
 ]
 
 [dependency-groups]

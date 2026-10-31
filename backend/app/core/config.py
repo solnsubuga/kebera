@@ -22,6 +22,22 @@ class Settings(BaseSettings):
     # How long the worker may be silent before /api/health reports it as down.
     worker_stale_seconds: int = 180
 
+    # --- sign-in (see app/services/auth.py) ---
+    # Where the web app is, for the links in emails.
+    public_url: str = "http://localhost:5173"
+    # Anyone may sign up and open a new firm. Off: firms are made with `python -m app.cli create-firm`.
+    signup_open: bool = True
+    session_hours: int = 168
+    link_minutes: int = 15
+    # Secure cookies. Unset: on when the request came in over https. Set it to 1 behind an https proxy.
+    cookie_secure: bool | None = None
+
+    # --- email (see app/services/mailer.py) ---
+    # console writes each email to the log (and keeps it in memory for tests); resend sends it.
+    email_backend: Literal["console", "resend"] = "console"
+    email_from: str = "Kebera <no-reply@localhost>"
+    resend_api_key: str = ""
+
     @field_validator("database_url")
     @classmethod
     def _psycopg3(cls, url: str) -> str:

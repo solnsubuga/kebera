@@ -1,4 +1,8 @@
-"""Engagement queries and changes. Routes stay thin; the rules live here."""
+"""Engagement queries and changes. Routes stay thin; the rules live here.
+
+Every function takes the caller's firm and filters on it, so one firm can never read or change another's
+engagements; an engagement of another firm looks exactly like one that does not exist.
+"""
 
 import uuid
 
@@ -16,9 +20,9 @@ class InvalidTransition(ValueError):
 
 
 def list_engagements(
-    session: Session, *, status: EngagementStatus | None, limit: int, offset: int
+    session: Session, firm_id: uuid.UUID, *, status: EngagementStatus | None, limit: int, offset: int
 ) -> tuple[list[Engagement], int]:
-    query = select(Engagement)
+    query = select(Engagement).where(Engagement.firm_id == firm_id)
     if status is not None:
         query = query.where(Engagement.status == status)
     total = session.scalar(select(func.count()).select_from(query.subquery())) or 0
@@ -28,12 +32,14 @@ def list_engagements(
     return list(rows), total
 
 
-def get_engagement(session: Session, engagement_id: uuid.UUID) -> Engagement | None:
-    return session.get(Engagement, engagement_id)
+def get_engagement(session: Session, firm_id: uuid.UUID, engagement_id: uuid.UUID) -> Engagement | None:
+    return session.scalar(
+        select(Engagement).where(Engagement.id == engagement_id, Engagement.firm_id == firm_id)
+    )
 
 
-def create_engagement(session: Session, data: EngagementCreate) -> Engagement:
-    engagement = Engagement(**data.model_dump())
+def create_engagement(session: Session, firm_id: uuid.UUID, data: EngagementCreate) -> Engagement:
+    engagement = Engagement(firm_id=firm_id, **data.model_dump())
     session.add(engagement)
     session.commit()
     return engagement

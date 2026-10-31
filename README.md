@@ -34,6 +34,11 @@ make web      # terminal 3: http://localhost:5173
 
 `make help` lists every task.
 
+Open `/signin`, choose **New firm**, and the sign-in link is printed in the API log (`make logs`) until real
+email is set up. Or from the shell: `docker compose exec api python -m app.cli create-firm "Your firm"
+you@example.com`, then `... python -m app.cli link you@example.com`. Each firm sees only its own engagements;
+see [docs/architecture.md](docs/architecture.md#sign-in-and-firms).
+
 ## Checks
 
 ```sh
@@ -55,9 +60,10 @@ backend/
     core/              settings (KEBERA_* env vars), database, logging
     models/            SQLAlchemy tables (import them in models/__init__.py)
     schemas/           Pydantic request and response shapes
-    services/          the rules: queries and changes, no HTTP
+    services/          the rules: queries and changes, no HTTP (auth.py: sign-in, firms, roles)
     api/routes/        thin HTTP handlers: parse, call a service, shape the answer
     worker/            the scheduler process and its tasks
+    cli.py             firms, members and sign-in links from the shell
   alembic/versions/    migrations
   tests/
 frontend/
