@@ -1,6 +1,6 @@
 # The web app: built once with Node, then served by nginx, which also passes /api/ to the API.
 #   docker build -t kebera-web frontend
-FROM node:22-alpine AS build
+FROM node:25-alpine AS build
 WORKDIR /web
 COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund
