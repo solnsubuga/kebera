@@ -2,6 +2,7 @@
 
     python -m app.worker                      # run the scheduler (exactly one per deployment)
     python -m app.worker run-once <task>      # run one task now and exit
+    python -m app.worker check                # exit 0 if the worker's heartbeat is fresh (Docker healthcheck)
 
 The API never runs scheduled work itself, so scaling the API never runs a job twice. The schedules live in
 Postgres (APScheduler's apscheduler_jobs table), so they survive restarts, and they only run when
@@ -10,6 +11,7 @@ KEBERA_SCHEDULES_ENABLED is on. A heartbeat is written every minute either way, 
 
 import signal
 import sys
+from datetime import UTC, datetime, timedelta
 from types import FrameType
 
 import structlog
@@ -18,11 +20,13 @@ from apscheduler.jobstores.memory import MemoryJobStore
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.interval import IntervalTrigger
+from sqlalchemy import select
 
 from app.core.config import get_settings
 from app.core.db import SessionLocal, engine
 from app.core.logging import configure_logging
-from app.worker.heartbeat import beat
+from app.models import WorkerHeartbeat
+from app.worker.heartbeat import WORKER_NAME, beat
 from app.worker.tasks import SCHEDULES, TASKS
 
 log = structlog.get_logger("kebera.worker")
@@ -31,6 +35,13 @@ log = structlog.get_logger("kebera.worker")
 def heartbeat() -> None:
     with SessionLocal() as session:
         beat(session)
+
+
+def heartbeat_is_fresh() -> bool:
+    with SessionLocal() as session:
+        seen = session.scalar(select(WorkerHeartbeat.seen_at).where(WorkerHeartbeat.name == WORKER_NAME))
+    stale = timedelta(seconds=get_settings().worker_stale_seconds)
+    return seen is not None and datetime.now(UTC) - seen < stale
 
 
 def build_scheduler(schedules_enabled: bool) -> BlockingScheduler:
@@ -60,6 +71,8 @@ def main(argv: list[str]) -> int:
             return 2
         TASKS[argv[1]]()
         return 0
+    if argv == ["check"]:
+        return 0 if heartbeat_is_fresh() else 1
     if argv:
         print(__doc__, file=sys.stderr)
         return 2

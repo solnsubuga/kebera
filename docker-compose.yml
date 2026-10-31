@@ -35,7 +35,11 @@ services:
   worker:  # exactly one: it owns the schedules
     <<: *api-image
     command: ["python", "-m", "app.worker"]
-    healthcheck: {disable: true}
+    healthcheck:  # healthy while its heartbeat (written every minute) is fresh
+      test: ["CMD", "python", "-m", "app.worker", "check"]
+      interval: 30s
+      timeout: 10s
+      start_period: 20s
     stop_grace_period: 30s
     deploy: {replicas: 1}
     depends_on:
