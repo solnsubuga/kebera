@@ -1,0 +1,67 @@
+# Kebera, the whole stack. Settings come from .env (copy .env.example).
+#
+#   docker compose up --build -d          # as in production: http://localhost:8080
+#   make dev                              # development with hot reload (adds docker-compose.dev.yml)
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d   # a server, with https
+name: kebera
+
+x-api-env: &api-env
+  KEBERA_ENV: ${KEBERA_ENV:-dev}
+  KEBERA_DATABASE_URL: ${KEBERA_DATABASE_URL:-postgresql+psycopg://kebera:${POSTGRES_PASSWORD:-kebera}@db:5432/kebera}
+  KEBERA_SCHEDULES_ENABLED: ${KEBERA_SCHEDULES_ENABLED:-0}
+  KEBERA_LOG_LEVEL: ${KEBERA_LOG_LEVEL:-INFO}
+  KEBERA_CORS_ORIGINS: ${KEBERA_CORS_ORIGINS:-["http://localhost:5173"]}
+
+x-api-image: &api-image
+  build: backend
+  image: kebera-api:local
+  environment: *api-env
+  restart: unless-stopped
+
+services:
+  web:  # the React app, served by nginx, which also passes /api/ to the API
+    build: frontend
+    restart: unless-stopped
+    ports: ["${KEBERA_WEB_PORT:-8080}:80"]
+    depends_on:
+      api: {condition: service_healthy}
+
+  api:
+    <<: *api-image
+    ports: ["127.0.0.1:${KEBERA_API_PORT:-8000}:8000"]  # for scripts and /api/docs; browsers go through web
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+
+  worker:  # exactly one: it owns the schedules
+    <<: *api-image
+    command: ["python", "-m", "app.worker"]
+    healthcheck: {disable: true}
+    stop_grace_period: 30s
+    deploy: {replicas: 1}
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+
+  migrate:  # runs once on every start, before the API and the worker
+    <<: *api-image
+    restart: "no"
+    command: ["alembic", "upgrade", "head"]
+    healthcheck: {disable: true}
+    depends_on:
+      db: {condition: service_healthy}
+
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: kebera
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kebera}  # only read when the volume is first created
+      POSTGRES_DB: kebera
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kebera -d kebera"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:
