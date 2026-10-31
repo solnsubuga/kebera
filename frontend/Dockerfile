@@ -7,7 +7,7 @@ RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund
 COPY . .
 RUN npm run build
 
-FROM nginx:1.29-alpine
+FROM nginx:1.31-alpine
 # Where nginx finds the API (the compose service by default).
 ENV KEBERA_API_URL=http://api:8000
 COPY docker/nginx.conf.template /etc/nginx/templates/default.conf.template
