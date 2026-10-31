@@ -14,8 +14,7 @@ export function HealthIndicator() {
         : data.database
           ? 'Worker not running'
           : 'Database down'
-  const color =
-    isError || data?.database === false ? 'bg-destructive' : data?.status === 'ok' ? 'bg-primary' : 'bg-amber-500'
+  const color = isError || data?.database === false ? 'bg-destructive' : data?.status === 'ok' ? 'bg-pine' : 'bg-ochre'
   return (
     <p className="text-muted-foreground flex items-center gap-2 text-xs" role="status">
       <span

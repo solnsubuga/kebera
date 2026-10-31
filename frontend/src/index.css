@@ -1,57 +1,131 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@import '@fontsource-variable/inter';
+@import '@fontsource/geist-mono/400.css';
+@import '@fontsource/geist-mono/500.css';
+@import '@fontsource/geist-mono/600.css';
+@import '@fontsource-variable/newsreader';
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+ * Tickmark design language. Inks on a quiet grey ground:
+ * graphite is a person's commitment, blue is what kebera wrote or cited, pine agrees,
+ * vermilion is an exception, ochre is the client. Use the named tokens, not raw hex.
+ */
 :root {
-  --radius: 0.5rem;
-  --background: oklch(0.99 0.002 95);
-  --foreground: oklch(0.2 0.01 260);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2 0.01 260);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2 0.01 260);
-  --primary: oklch(0.42 0.09 160);
-  --primary-foreground: oklch(0.98 0.01 160);
-  --secondary: oklch(0.96 0.005 260);
-  --secondary-foreground: oklch(0.25 0.01 260);
-  --muted: oklch(0.96 0.005 260);
-  --muted-foreground: oklch(0.5 0.015 260);
-  --accent: oklch(0.95 0.01 160);
-  --accent-foreground: oklch(0.25 0.03 160);
-  --destructive: oklch(0.55 0.2 27);
-  --border: oklch(0.91 0.005 260);
-  --input: oklch(0.91 0.005 260);
-  --ring: oklch(0.42 0.09 160);
+  --ink: #1d1d1f;
+  --ink-soft: #515154;
+  --ink-muted: #6e6e73;
+  --link: #0066cc;
+  --link-hover: #004c99;
+  --link-wash: #eaf3fd;
+  --pine: #1e7b34;
+  --pine-wash: #e7f5ea;
+  --vermilion: #c4161c;
+  --vermilion-wash: #fbe7e7;
+  --ochre: #9a5200;
+  --ochre-wash: #fff6e5;
+  --ochre-rule: #f2ddb3;
+  --ground: #f5f5f7;
+  --sheet: #ffffff;
+  --fill: #ededf0;
+  --rule: #e3e3e8;
+  --rule-soft: #ededf0;
+  --rule-strong: #d2d2d7;
+  --highlight: #fff1c2;
+  --rail: rgb(250 250 252 / 0.82);
+  --frost: rgb(255 255 255 / 0.86);
+  --on-ink: #ffffff;
+
+  --radius: 0.625rem;
+  --background: var(--ground);
+  --foreground: var(--ink);
+  --card: var(--sheet);
+  --card-foreground: var(--ink);
+  --popover: var(--sheet);
+  --popover-foreground: var(--ink);
+  --primary: var(--link);
+  --primary-foreground: #ffffff;
+  --secondary: var(--fill);
+  --secondary-foreground: var(--ink);
+  --muted: var(--fill);
+  --muted-foreground: var(--ink-muted);
+  --accent: var(--fill);
+  --accent-foreground: var(--ink);
+  --destructive: var(--vermilion);
+  --border: var(--rule);
+  --input: var(--rule-strong);
+  --ring: var(--link);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04), 0 6px 24px rgb(0 0 0 / 0.05);
+  --shadow-raised: 0 1px 2px rgb(0 0 0 / 0.06), 0 0 0 0.5px rgb(0 0 0 / 0.06);
 }
 
 .dark {
-  --background: oklch(0.17 0.01 260);
-  --foreground: oklch(0.96 0.005 260);
-  --card: oklch(0.21 0.01 260);
-  --card-foreground: oklch(0.96 0.005 260);
-  --popover: oklch(0.21 0.01 260);
-  --popover-foreground: oklch(0.96 0.005 260);
-  --primary: oklch(0.72 0.11 160);
-  --primary-foreground: oklch(0.2 0.03 160);
-  --secondary: oklch(0.27 0.01 260);
-  --secondary-foreground: oklch(0.96 0.005 260);
-  --muted: oklch(0.27 0.01 260);
-  --muted-foreground: oklch(0.7 0.01 260);
-  --accent: oklch(0.3 0.03 160);
-  --accent-foreground: oklch(0.96 0.005 260);
-  --destructive: oklch(0.65 0.2 25);
-  --border: oklch(1 0 0 / 12%);
-  --input: oklch(1 0 0 / 16%);
-  --ring: oklch(0.72 0.11 160);
+  --ink: #f5f5f7;
+  --ink-soft: #c7c7cc;
+  --ink-muted: #98989d;
+  --link: #4ea1ff;
+  --link-hover: #7ab8ff;
+  --link-wash: rgb(78 161 255 / 0.16);
+  --pine: #4cc06a;
+  --pine-wash: rgb(76 192 106 / 0.16);
+  --vermilion: #ff5a5f;
+  --vermilion-wash: rgb(255 90 95 / 0.16);
+  --ochre: #f0a640;
+  --ochre-wash: rgb(240 166 64 / 0.14);
+  --ochre-rule: rgb(240 166 64 / 0.32);
+  --ground: #111113;
+  --sheet: #1c1c1e;
+  --fill: #2c2c2e;
+  --rule: #2f2f33;
+  --rule-soft: #26262a;
+  --rule-strong: #3d3d42;
+  --highlight: rgb(255 214 10 / 0.24);
+  --rail: rgb(28 28 30 / 0.8);
+  --frost: rgb(28 28 30 / 0.86);
+  --on-ink: #1d1d1f;
+  --primary-foreground: #0b0b0c;
+  --shadow-card: 0 0 0 1px rgb(255 255 255 / 0.06);
+  --shadow-raised: 0 0 0 1px rgb(255 255 255 / 0.1);
 }
 
 @theme inline {
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-serif: 'Newsreader Variable', 'Newsreader', Georgia, serif;
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --radius-card: 18px;
+  --shadow-card: var(--shadow-card);
+  --shadow-raised: var(--shadow-raised);
+
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-muted: var(--ink-muted);
+  --color-on-ink: var(--on-ink);
+  --color-link: var(--link);
+  --color-link-hover: var(--link-hover);
+  --color-link-wash: var(--link-wash);
+  --color-pine: var(--pine);
+  --color-pine-wash: var(--pine-wash);
+  --color-vermilion: var(--vermilion);
+  --color-vermilion-wash: var(--vermilion-wash);
+  --color-ochre: var(--ochre);
+  --color-ochre-wash: var(--ochre-wash);
+  --color-ochre-rule: var(--ochre-rule);
+  --color-ground: var(--ground);
+  --color-sheet: var(--sheet);
+  --color-fill: var(--fill);
+  --color-rule: var(--rule);
+  --color-rule-soft: var(--rule-soft);
+  --color-rule-strong: var(--rule-strong);
+  --color-highlight: var(--highlight);
+  --color-rail: var(--rail);
+  --color-frost: var(--frost);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -70,13 +144,50 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  --animate-mark-fill: mark-fill 120ms ease-out;
+  @keyframes mark-fill {
+    from {
+      transform: scale(0.82);
+      opacity: 0.4;
+    }
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+}
+
+/* Amounts: tabular figures so columns foot by eye. */
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings:
+    'tnum' 1,
+    'cv11' 1;
+}
+
+/* Frosted glass for the rail, sticky headers and the sign line. */
+@utility frosted {
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground font-sans text-sm antialiased;
+    font-feature-settings:
+      'cv11' 1,
+      'ss01' 1;
+    letter-spacing: -0.006em;
+  }
+  ::selection {
+    background: var(--link-wash);
   }
 }
