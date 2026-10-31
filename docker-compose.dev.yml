@@ -1,0 +1,46 @@
+# Development: code from this checkout, reloaded on save. Use with the base file (make dev):
+#   web (Vite, hot reload)  http://localhost:5173
+#   api                     http://localhost:8000/api/docs
+#   postgres                localhost:5432 (kebera / kebera)
+services:
+  web:
+    build: !reset null
+    image: node:22-alpine
+    working_dir: /web
+    environment:
+      KEBERA_API_URL: http://api:8000
+    command:
+      - sh
+      - -c
+      - |
+        h=$$(md5sum package-lock.json)
+        [ "$$h" = "$$(cat node_modules/.lockhash 2>/dev/null)" ] || { npm ci --no-audit --no-fund && echo "$$h" > node_modules/.lockhash; }
+        exec npm run dev -- --host 0.0.0.0 --port 5173
+    volumes:
+      - ./frontend:/web
+      - web_node_modules:/web/node_modules  # Linux packages stay in the container
+    ports: !override ["5173:5173"]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:5173/"]
+      interval: 10s
+      start_period: 120s
+
+  api:
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--reload-dir", "app"]
+    environment:
+      KEBERA_LOG_JSON: "0"
+    volumes: ["./backend/app:/srv/app", "./backend/alembic:/srv/alembic"]
+
+  worker:  # not reloaded (it would cut a running job short): docker compose restart worker
+    environment:
+      KEBERA_LOG_JSON: "0"
+    volumes: ["./backend/app:/srv/app"]
+
+  migrate:
+    volumes: ["./backend/alembic:/srv/alembic", "./backend/app:/srv/app"]
+
+  db:
+    ports: ["127.0.0.1:5432:5432"]
+
+volumes:
+  web_node_modules:
