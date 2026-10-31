@@ -12,7 +12,17 @@ const soon = (title: string) => async () => ({ Component: () => <ComingSoon titl
 
 export const routes: RouteObject[] = [
   // Client answers requests on a phone, outside the firm's app.
-  { path: 'c/:token', lazy: soon('Client requests') },
+  {
+    path: 'c/:token',
+    lazy: async () => ({
+      Component: (await import('@/features/client-portal/pages/client-request-page')).ClientRequestPage,
+    }),
+  },
+  // The partner signs on a phone, outside the app shell, so nothing distracts from the decision.
+  {
+    path: 'engagements/:id/report/sign',
+    lazy: async () => ({ Component: (await import('@/features/report/pages/sign-page')).SignPage }),
+  },
   {
     element: <AppShell />,
     children: [
@@ -28,7 +38,6 @@ export const routes: RouteObject[] = [
           { path: 'inbox', lazy: soon('Inbox') },
           { path: 'reviews', lazy: soon('My reviews') },
           { path: 'library', lazy: soon('Library') },
-          { path: 'trust', lazy: soon('Trust') },
           { path: 'ask', lazy: soon('Ask') },
           { path: 'ask/:runId', lazy: soon('Run') },
           {
@@ -37,6 +46,11 @@ export const routes: RouteObject[] = [
           },
           { path: '*', element: <NotFoundPage /> },
         ],
+      },
+      // Trust runs full width on the grey ground, like the engagement screens.
+      {
+        path: 'trust',
+        lazy: async () => ({ Component: (await import('@/features/trust/pages/trust-page')).TrustPage }),
       },
       {
         path: 'engagements/:id',
@@ -63,12 +77,24 @@ export const routes: RouteObject[] = [
               { path: 'tests', lazy: soon('Full-population tests') },
               { path: 'exceptions', lazy: soon('Exception triage') },
               { path: 'workpapers', lazy: soon('Workpapers') },
-              { path: 'requests', lazy: soon('Client requests') },
+              {
+                path: 'requests',
+                lazy: async () => ({
+                  Component: (await import('@/features/requests/pages/requests-page')).RequestsPage,
+                }),
+              },
             ],
           },
-          { path: 'evaluate', lazy: soon('Evaluate misstatements') },
-          { path: 'report', lazy: soon('Letter and opinion draft') },
-          { path: 'report/sign', lazy: soon('Partner sign-off') },
+          {
+            path: 'evaluate',
+            lazy: async () => ({
+              Component: (await import('@/features/evaluate/pages/misstatements-page')).MisstatementsPage,
+            }),
+          },
+          {
+            path: 'report',
+            lazy: async () => ({ Component: (await import('@/features/report/pages/report-page')).ReportPage }),
+          },
           { path: '*', element: <NotFoundPage /> },
         ],
       },
