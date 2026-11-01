@@ -2,6 +2,7 @@ import { Link, Outlet, useLocation, useOutletContext, useParams } from 'react-ro
 
 import { Skeleton } from '@/components/ui/skeleton'
 import { useEngagement } from '@/features/engagements/api'
+import { TEST_TAB_COUNTS } from '@/features/testing/mock-data'
 import { ApiError } from '@/lib/api-client'
 
 import { EngagementHeader } from './engagement-header'
@@ -46,7 +47,8 @@ export function TestStageLayout() {
   const engagement = useOutletContext()
   return (
     <>
-      <EngagementTabs label="Test views" items={testTabs(id)} />
+      {/* Counts are sample data until the API serves tests, exceptions and workpapers. */}
+      <EngagementTabs label="Test views" items={testTabs(id, TEST_TAB_COUNTS)} />
       <div className="flex min-h-0 flex-1 flex-col">
         <Outlet context={engagement} />
       </div>
