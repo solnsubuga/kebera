@@ -1,25 +1,28 @@
 import type { ReactNode } from 'react'
 
-import { ThemeToggle } from '@/components/layout/theme-toggle'
+import { BRAND } from '@/lib/brand'
 
-/** The frame around the signed-out pages: the name, a short line on what Kebera is, and one card. */
+/** The signed-out frame: the brand mark from the rail, one white sheet on the grey ground. */
 export function AuthLayout(props: { title: string; description?: ReactNode; children: ReactNode }) {
   return (
-    <div className="bg-muted/40 flex min-h-svh flex-col">
-      <header className="flex items-center justify-between px-4 py-4 md:px-8">
-        <span className="text-lg font-semibold tracking-tight">kebera</span>
-        <ThemeToggle />
-      </header>
-      <main className="flex flex-1 items-start justify-center px-4 pt-8 pb-16 md:pt-20">
-        <div className="bg-card w-full max-w-sm rounded-xl border p-6 shadow-sm">
-          <h1 className="text-xl font-semibold tracking-tight">{props.title}</h1>
-          {props.description && <p className="text-muted-foreground mt-1 text-sm">{props.description}</p>}
-          <div className="mt-6">{props.children}</div>
-        </div>
+    <div className="bg-ground flex min-h-svh flex-col items-center px-4 pt-16 pb-10 md:pt-28">
+      <div className="mb-6 flex items-center gap-2.5">
+        <span
+          aria-hidden="true"
+          className="flex size-8 items-center justify-center rounded-[9px] bg-gradient-to-b from-[#2c2c2e] to-[#1d1d1f] font-mono text-[16px] font-semibold text-white"
+        >
+          {BRAND[0]}
+        </span>
+        <span className="text-[17px] font-semibold">{BRAND}</span>
+      </div>
+      <main className="bg-sheet rounded-card shadow-card w-full max-w-[380px] p-7">
+        <h1 className="text-[19px] font-semibold tracking-tight">{props.title}</h1>
+        {props.description && <p className="text-ink-muted mt-1.5 text-sm">{props.description}</p>}
+        <div className="mt-6">{props.children}</div>
       </main>
-      <footer className="text-muted-foreground px-4 pb-6 text-center text-xs">
-        Each firm sees only its own engagements.
-      </footer>
+      <p className="text-ink-muted mt-6 max-w-[380px] text-center text-xs">
+        Each firm sees only its own engagements. {BRAND} does the evidence work; a licensed auditor decides and signs.
+      </p>
     </div>
   )
 }

@@ -12,7 +12,7 @@ describe('sign-in', () => {
   it('sends a signed-out visitor to sign in, remembering where they were going', async () => {
     mockSignedIn(() => page, null)
     const { router } = renderApp('/engagements/abc')
-    expect(await screen.findByRole('heading', { name: 'Sign in to Kebera' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeInTheDocument()
     expect(router.state.location.pathname).toBe('/signin')
     expect(router.state.location.search).toBe('?next=%2Fengagements%2Fabc')
   })
@@ -21,7 +21,7 @@ describe('sign-in', () => {
     const fetchMock = mockSignedIn(() => ({ sent: true }), null)
     renderApp('/signin')
     await userEvent.type(await screen.findByLabelText('Work email'), 'ama@mukasa.test')
-    await userEvent.click(screen.getByRole('button', { name: 'Email me a sign-in link' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Email me a link' }))
     expect(await screen.findByRole('heading', { name: 'Check your email' })).toBeInTheDocument()
     const call = fetchMock.mock.calls.find(([u]) => String(u) === '/api/auth/link')
     expect(JSON.parse(String(call?.[1]?.body))).toEqual({ email: 'ama@mukasa.test' })
@@ -30,7 +30,7 @@ describe('sign-in', () => {
   it('opens a new firm', async () => {
     const fetchMock = mockSignedIn(() => ({ sent: true }), null)
     renderApp('/signin')
-    await userEvent.click(await screen.findByRole('tab', { name: 'New firm' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Open your firm' }))
     await userEvent.type(screen.getByLabelText('Firm name'), 'Mukasa & Co')
     await userEvent.type(screen.getByLabelText('Work email'), 'ama@mukasa.test')
     await userEvent.click(screen.getByRole('button', { name: 'Open firm' }))
@@ -53,14 +53,14 @@ describe('sign-in', () => {
       return page
     }, null)
     renderApp('/auth/verify?token=abc')
-    expect(await screen.findByRole('heading', { name: 'Choose your password' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Choose a password' })).toBeInTheDocument()
     expect(fetchMock.mock.calls.filter(([u]) => String(u) === '/api/auth/verify')).toHaveLength(1)
 
-    await userEvent.type(screen.getByLabelText('New password'), 'a long enough password')
-    await userEvent.type(screen.getByLabelText('Type it again'), 'a long enough password')
-    await userEvent.click(screen.getByRole('button', { name: 'Save and continue' }))
+    await userEvent.type(screen.getByLabelText('Password'), 'a long enough password')
+    await userEvent.type(screen.getByLabelText('Again'), 'a long enough password')
+    await userEvent.click(screen.getByRole('button', { name: 'Continue' }))
     expect(await screen.findByRole('heading', { name: 'Engagements' })).toBeInTheDocument()
-    expect(screen.getByText('Mukasa & Co')).toBeInTheDocument()
+    expect(screen.getByText('Mukasa & Co')).toBeInTheDocument() // the firm, under the brand in the rail
   })
 
   it('says when a link has expired', async () => {
@@ -73,21 +73,23 @@ describe('sign-in', () => {
     expect(screen.getByRole('link', { name: 'Get a new sign-in link' })).toBeInTheDocument()
   })
 
-  it('switches between firms', async () => {
+  it('offers the other firms in the palette', async () => {
     const two: Me = {
       ...partner,
       firms: [partner.firm!, { id: 'f2', name: 'Okello Associates', role: 'manager' }],
     }
     mockSignedIn(() => page, two)
     renderApp('/')
-    expect(await screen.findByRole('combobox', { name: 'Firm' })).toHaveTextContent('Mukasa & Co')
+    await screen.findByRole('navigation', { name: 'Main' })
+    await userEvent.keyboard('{Control>}k{/Control}')
+    expect(await screen.findByText('Switch to Okello Associates')).toBeInTheDocument()
   })
 
   it('signs out', async () => {
     const fetchMock = mockSignedIn(() => new Response(null, { status: 204 }))
     renderApp('/')
     await userEvent.click(await screen.findByRole('button', { name: 'Sign out' }))
-    expect(await screen.findByRole('heading', { name: 'Sign in to Kebera' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: 'Sign in' })).toBeInTheDocument()
     expect(fetchMock.mock.calls.some(([u]) => String(u) === '/api/auth/logout')).toBe(true)
   })
 })

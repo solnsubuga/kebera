@@ -58,6 +58,5 @@ describe('engagements', () => {
     renderApp('/')
     expect(await screen.findByRole('link', { name: 'Acme Uganda Ltd' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /New engagement/ })).not.toBeInTheDocument()
-    expect(screen.queryByRole('link', { name: 'People' })).not.toBeInTheDocument()
   })
 })

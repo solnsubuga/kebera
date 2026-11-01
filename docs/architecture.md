@@ -55,7 +55,7 @@ password (Argon2; five wrong ones lock the account for 15 minutes). Roles and wh
 
 A person can be in several firms and switch between them. Sessions are an HttpOnly, SameSite=Lax cookie for
 the web app or `Authorization: Bearer <token>` for scripts; only token hashes are stored. Sign-ins and changes
-to people, roles and engagements go to `audit_events`, which partners read at `/audit`.
+to people, roles and engagements go to `audit_events` (`GET /api/audit`, partners). Partners add people with `POST /api/members`; their screens come with the Trust and settings work.
 
 Anyone can open a new firm from the sign-in page (turn that off with `KEBERA_SIGNUP_OPEN=0`). From the
 server's shell, `python -m app.cli` creates firms, adds members, prints a sign-in link (for when email is not

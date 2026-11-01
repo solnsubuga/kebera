@@ -22,7 +22,7 @@ export function VerifyPage() {
     started.current = true // a link works once, so never send it twice (React runs effects twice in dev)
     verify.mutate(token, {
       onSuccess: ({ me }) => {
-        const to = me.password_step ? `/signin/password?next=${encodeURIComponent(next)}` : next
+        const to = me.password_step ? `/signin?next=${encodeURIComponent(next)}` : next
         void navigate(to, { replace: true })
       },
     })
@@ -37,7 +37,7 @@ export function VerifyPage() {
           : 'This link is incomplete.'
     return (
       <AuthLayout title="This link didn't work" description={capitalise(message)}>
-        <Link to="/signin" className="text-primary text-sm underline">
+        <Link to="/signin" className="text-link text-sm hover:underline">
           Get a new sign-in link
         </Link>
       </AuthLayout>
