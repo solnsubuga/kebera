@@ -32,7 +32,7 @@ describe('engagements', () => {
   it('filters by phase through the API', async () => {
     const fetchMock = mockApi((url) => (url.pathname === '/api/health' ? health : page([])))
     renderApp('/')
-    await userEvent.click(await screen.findByRole('button', { name: 'Signed' }))
+    await userEvent.click(await screen.findByRole('button', { name: /^Signed/ }))
     expect(await screen.findByText('No engagements in signed.')).toBeInTheDocument()
     expect(fetchMock.mock.calls.some(([u]) => String(u) === '/api/engagements?status=signed')).toBe(true)
   })
