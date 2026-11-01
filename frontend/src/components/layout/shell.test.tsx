@@ -1,4 +1,4 @@
-import { act, screen, within } from '@testing-library/react'
+import { act, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it } from 'vitest'
 
@@ -47,7 +47,8 @@ describe('app shell', () => {
     const input = await screen.findByPlaceholderText('Ask kebera, or type a screen')
     await userEvent.type(input, 'duplicate payments')
     await userEvent.keyboard('{Enter}')
-    expect(router.state.location.pathname).toBe('/ask')
+    // The ask screen loads lazily, so the navigation settles after its chunk arrives.
+    await waitFor(() => expect(router.state.location.pathname).toBe('/ask'))
     expect(router.state.location.search).toBe('?q=duplicate%20payments')
   })
 

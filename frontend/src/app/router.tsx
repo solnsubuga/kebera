@@ -38,14 +38,18 @@ export const routes: RouteObject[] = [
           { path: 'inbox', lazy: soon('Inbox') },
           { path: 'reviews', lazy: soon('My reviews') },
           { path: 'library', lazy: soon('Library') },
-          { path: 'ask', lazy: soon('Ask') },
-          { path: 'ask/:runId', lazy: soon('Run') },
           {
             path: 'design',
             lazy: async () => ({ Component: (await import('@/features/design/design-page')).DesignPage }),
           },
           { path: '*', element: <NotFoundPage /> },
         ],
+      },
+      // Ask runs full width, with the engagement header the run belongs to.
+      { path: 'ask', lazy: async () => ({ Component: (await import('@/features/agent/pages/ask-page')).AskPage }) },
+      {
+        path: 'ask/:runId',
+        lazy: async () => ({ Component: (await import('@/features/agent/pages/ask-page')).AskPage }),
       },
       // Trust runs full width on the grey ground, like the engagement screens.
       {
@@ -86,8 +90,14 @@ export const routes: RouteObject[] = [
               Component: (await import('@/features/engagements/pages/materiality-page')).MaterialityPage,
             }),
           },
-          { path: 'risk', lazy: soon('Risks to assertions') },
-          { path: 'plan', lazy: soon('Audit plan') },
+          {
+            path: 'risk',
+            lazy: async () => ({ Component: (await import('@/features/risk/pages/risk-page')).RiskPage }),
+          },
+          {
+            path: 'plan',
+            lazy: async () => ({ Component: (await import('@/features/plan/pages/plan-page')).PlanPage }),
+          },
           {
             path: 'test',
             element: <TestStageLayout />,
