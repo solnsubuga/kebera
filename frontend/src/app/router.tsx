@@ -29,14 +29,18 @@ export const routes: RouteObject[] = [
           { path: 'reviews', lazy: soon('My reviews') },
           { path: 'library', lazy: soon('Library') },
           { path: 'trust', lazy: soon('Trust') },
-          { path: 'ask', lazy: soon('Ask') },
-          { path: 'ask/:runId', lazy: soon('Run') },
           {
             path: 'design',
             lazy: async () => ({ Component: (await import('@/features/design/design-page')).DesignPage }),
           },
           { path: '*', element: <NotFoundPage /> },
         ],
+      },
+      // Ask runs full width, with the engagement header the run belongs to.
+      { path: 'ask', lazy: async () => ({ Component: (await import('@/features/agent/pages/ask-page')).AskPage }) },
+      {
+        path: 'ask/:runId',
+        lazy: async () => ({ Component: (await import('@/features/agent/pages/ask-page')).AskPage }),
       },
       {
         path: 'engagements/:id',
@@ -52,8 +56,14 @@ export const routes: RouteObject[] = [
           { path: 'connect', lazy: soon('Connect books and tie out') },
           { path: 'understand', lazy: soon('Folder and compliance review') },
           { path: 'materiality', lazy: soon('Set materiality') },
-          { path: 'risk', lazy: soon('Risks to assertions') },
-          { path: 'plan', lazy: soon('Audit plan') },
+          {
+            path: 'risk',
+            lazy: async () => ({ Component: (await import('@/features/risk/pages/risk-page')).RiskPage }),
+          },
+          {
+            path: 'plan',
+            lazy: async () => ({ Component: (await import('@/features/plan/pages/plan-page')).PlanPage }),
+          },
           {
             path: 'test',
             element: <TestStageLayout />,
